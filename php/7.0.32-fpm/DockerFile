@@ -1,14 +1,34 @@
 FROM php:7.0.32-fpm
 LABEL version="1.0"
 LABEL description="php:7.0.32-fpm"
-LABEL maintainer="stefan<losthorse007@gmail.com>"
+LABEL maintainer="stefan<1256182135@QQ.com>"
 #安装环境
 RUN set -ex \
 && apt-get update \
- --- 安装扩展 — #
+&& apt-get install -y
+#gd库相关系统依赖
+libfreetype6-dev \
+libicu-dev \
+libjpeg62-turbo-dev \
+libmcrypt-dev \
+libpng-dev \
+libxslt1-dev
+
+# --- 安装扩展 —
+# 配置PHP的gd库
+RUN docker-php-ext-configure \
+gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+
 #mysql pdo
-&& docker-php-ext-install pdo_mysql \
+RUN docker-php-ext-install pdo_mysql \
 && docker-php-ext-enable  pdo_mysql.so \
+#gd
+&& docker-php-ext-install gd  \
+&& docker-php-ext-enable  gd.so \
+
 # redis
 && pecl install redis \
-&& docker-php-ext-enable redis.so
+&& docker-php-ext-enable redis.so \
+# xdebug
+&& pecl install xdebug \
+&& docker-php-ext-enable xdebug.so
