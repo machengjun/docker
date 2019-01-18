@@ -3,7 +3,8 @@ LABEL version="1.0"
 LABEL description="php:7.0.32-fpm"
 LABEL maintainer="stefan<1256182135@QQ.com>"
 
-# 国内不可抗拒因数，debian系统apt源更换阿里云镜像源
+#国内不可抗拒因数，debian系统apt源更换阿里云镜像源
+#若果有科学上网工具，开启全局模式后，注销以下代码，感受自由
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
 && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
 

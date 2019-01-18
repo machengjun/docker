@@ -7,6 +7,7 @@ pdo_mysql
 
 redis
 
+
 xdebug
 ## 使用
 在docker file 所在目录执行
