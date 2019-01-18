@@ -2,33 +2,39 @@ FROM php:7.0.32-fpm
 LABEL version="1.0"
 LABEL description="php:7.0.32-fpm"
 LABEL maintainer="stefan<1256182135@QQ.com>"
+
+# 国内不可抗拒因数，debian系统apt源更换阿里云镜像源
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
+&& sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+
+
 #安装环境
-RUN set -ex \
-&& apt-get update \
-&& apt-get install -y
+RUN  apt-get update \
+&& apt-get install -y \
 #gd库相关系统依赖
 libfreetype6-dev \
 libicu-dev \
 libjpeg62-turbo-dev \
 libmcrypt-dev \
-libpng-dev \
-libxslt1-dev
+libpng-dev
 
 # --- 安装扩展 —
 # 配置PHP的gd库
 RUN docker-php-ext-configure \
 gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
-
-#mysql pdo
-RUN docker-php-ext-install pdo_mysql \
-&& docker-php-ext-enable  pdo_mysql.so \
+#核心库
 #gd
-&& docker-php-ext-install gd  \
-&& docker-php-ext-enable  gd.so \
-
+RUN docker-php-ext-install gd \
+#mysql pdo
+pdo_mysql
+#pecl 由于国内访问pecl慢，容易出现pecl安装失败，可以注释下面代码，镜像安装成功后，自行补充安装
+RUN pecl update-channels \
+# xdebug
+&& pecl install -o -f xdebug \
+&& docker-php-ext-enable xdebug.so \
 # redis
 && pecl install redis \
-&& docker-php-ext-enable redis.so \
-# xdebug
-&& pecl install xdebug \
-&& docker-php-ext-enable xdebug.so
+&& docker-php-ext-enable redis.so
+# 加入配置文件
+COPY  etc/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY  etc/php.ini  /usr/local/etc/php/php.ini
